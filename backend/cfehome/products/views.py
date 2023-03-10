@@ -14,7 +14,10 @@ from .permissions import isStaffEditorPermission
 class ProductListCreateAPIView(generics.ListCreateAPIView):       # create data
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+        ]
     permission_classes = [permissions.IsAdminUser, isStaffEditorPermission]
 
     def perform_create(self, serializer):

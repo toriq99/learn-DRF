@@ -5,20 +5,25 @@ from rest_framework import generics, mixins, permissions, authentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+# from api.authentication import TokenAuthentication
+from api.mixins import StaffEditorPermissionMixin
+
 from .models import Product
 from .serializers import ProductSerializers
-from .permissions import isStaffEditorPermission
+# from ..api.permissions import isStaffEditorPermission
 
 # Create your views here.
 
-class ProductListCreateAPIView(generics.ListCreateAPIView):       # create data
+class ProductListCreateAPIView(
+    StaffEditorPermissionMixin,        # using permission in mixins.py
+    generics.ListCreateAPIView):       # create data
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        authentication.TokenAuthentication,
-        ]
-    permission_classes = [permissions.IsAdminUser, isStaffEditorPermission]
+    # authentication_classes = [
+    #     authentication.SessionAuthentication,
+    #     TokenAuthentication,
+    #     ]
+    # permission_classes = [permissions.IsAdminUser, isStaffEditorPermission]
 
     def perform_create(self, serializer):
         title = serializer.validated_data.get('title')
@@ -29,14 +34,18 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):       # create data
 
 product_list_create_view = ProductListCreateAPIView.as_view()
 
-class ProductDetailAPIView(generics.RetrieveAPIView):             # detail data
+class ProductDetailAPIView(
+    StaffEditorPermissionMixin, 
+    generics.RetrieveAPIView):             # detail data
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
 
 product_detail_view = ProductDetailAPIView.as_view()
 
 
-class ProductUpdateAPIView(generics.UpdateAPIView):               # update data
+class ProductUpdateAPIView(
+    StaffEditorPermissionMixin, 
+    generics.UpdateAPIView):               # update data
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
     lookup_field = 'pk'
@@ -49,7 +58,9 @@ class ProductUpdateAPIView(generics.UpdateAPIView):               # update data
 product_update_view = ProductUpdateAPIView.as_view()
 
 
-class ProductDeleteAPIView(generics.DestroyAPIView):              # delete data
+class ProductDeleteAPIView(
+    StaffEditorPermissionMixin, 
+    generics.DestroyAPIView):              # delete data
     queryset = Product.objects.all()
     serializer_class = ProductSerializers
     lookup_field = 'pk'
